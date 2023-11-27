@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="colorUserBubble">#64B5F6</color>
+    <color name="colorChatbotBubble">#FFC107</color>
+    <color name="colorUserText">#000000</color>
+    <color name="colorChatbotText">#000000</color>
 </resources>

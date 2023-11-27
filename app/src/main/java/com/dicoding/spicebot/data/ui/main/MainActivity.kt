@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.spicebot.AdapterChatbot
+import com.dicoding.spicebot.data.model.ChatModel
 import com.dicoding.spicebot.data.network.response.ChatResponse
 import com.dicoding.spicebot.data.network.retrofit.ApiConfig
 import com.dicoding.spicebot.databinding.ActivityMainBinding
@@ -51,9 +52,12 @@ class MainActivity : AppCompatActivity() {
 //            }
 
         binding.btnSend.setOnClickListener { view ->
-            postReview(binding.etChat.text.toString())
-//            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//            imm.hideSoftInputFromWindow(view.windowToken, 0)
+            val userMessage = binding.etChat.text.toString().trim()
+            if (userMessage.isNotEmpty()) {
+                addMessage(ChatModel(userMessage, false))
+                postReview(userMessage)
+                binding.etChat.text.clear()
+            }
         }
     }
 
@@ -66,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             ) {
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null) {
-                    setReviewData(responseBody.spiceBotReply)
+                    setReviewData(ChatModel(responseBody.spiceBotReply,true))
                 } else {
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
@@ -77,25 +81,13 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun setReviewData(chat: String) {
-        val adapter = AdapterChatbot()
-        adapter.submitList(chat)
-        binding.rvChatList.adapter = adapter
+    private fun setReviewData(chat: ChatModel) {
+        addMessage(chat)
         binding.etChat.text.clear()
     }
 
-//    private val callBack = object : Callback<ChatResponse>{
-//        override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
-//            if(response.isSuccessful && response.body()!= null){
-//                adapterChatBot.submitList(response.body()!!.spiceBotReply)
-//            }else{
-//                Toast.makeText(this@MainActivity, "Something went wrong", Toast.LENGTH_LONG).show()
-//            }
-//        }
-//
-//        override fun onFailure(call: Call<ChatResponse>, t: Throwable) {
-//            Toast.makeText(this@MainActivity, "Something went wrong", Toast.LENGTH_LONG).show()
-//        }
-//
-//    }
+    private fun addMessage(chat: ChatModel) {
+        adapterChatBot.submitList(chat)
+        binding.rvChatList.scrollToPosition(adapterChatBot.itemCount - 1)
+    }
 }

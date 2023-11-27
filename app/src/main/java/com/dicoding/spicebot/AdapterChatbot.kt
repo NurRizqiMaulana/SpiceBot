@@ -1,24 +1,39 @@
 package com.dicoding.spicebot
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.dicoding.spicebot.databinding.ListitemChatBinding
+import com.dicoding.spicebot.data.model.ChatModel
+import com.dicoding.spicebot.databinding.ChatopenListBinding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AdapterChatbot : RecyclerView.Adapter<AdapterChatbot.MyViewHolder>() {
-    private val list = ArrayList<String>()
+    private val list = ArrayList<ChatModel>()
 
-    inner class MyViewHolder(binding: ListitemChatBinding) : RecyclerView.ViewHolder(binding.root) {
-        var txtChat = binding.txtChat
+    inner class MyViewHolder(private val binding: ChatopenListBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(chat: String) {
-            txtChat.text = chat
+        fun bind(chat: ChatModel) {
 
+            if (!chat.isBot) {
+                binding.leftChatView.visibility = View.GONE
+                binding.rightChatView.visibility = View.VISIBLE
+                binding.rightChatTextView.text = chat.chat
+                binding.rightTimeTextView.text = getTimeString(chat.timeStamp)
+
+            } else {
+                binding.rightChatView.visibility = View.GONE
+                binding.leftChatView.visibility = View.VISIBLE
+                binding.leftChatTextView.text = chat.chat
+                binding.leftTimeTextView.text = getTimeString(chat.timeStamp)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : MyViewHolder {
-        val binding = ListitemChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ChatopenListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding)
     }
 
@@ -28,8 +43,15 @@ class AdapterChatbot : RecyclerView.Adapter<AdapterChatbot.MyViewHolder>() {
         holder.bind(list[position])
     }
 
-    fun submitList(newList: String) {
+    fun submitList(newList: ChatModel) {
         list.add(newList)
         notifyDataSetChanged()
+    }
+
+    private fun getTimeString(timeStamp: Long): String {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeStamp
+        val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return dateFormat.format(calendar.time)
     }
 }
