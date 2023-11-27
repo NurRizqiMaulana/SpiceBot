@@ -10,6 +10,6 @@ interface ApiService {
     @FormUrlEncoded
     @POST("chat")
     fun chatWithTheBit(
-        @Field("chatInput") chatText : String
+        @Field("chatInput") chatInput : String
     ): Call<ChatResponse>
 }
